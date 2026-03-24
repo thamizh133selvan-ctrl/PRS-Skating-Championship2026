@@ -141,6 +141,7 @@
 
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
+                if (!data || !data.name || !data.age) return;
                 data.id = docSnap.id;
 
                 if (!data.name && data.fullName) data.name = data.fullName;
