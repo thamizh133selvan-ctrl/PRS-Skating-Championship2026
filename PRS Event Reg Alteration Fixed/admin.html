@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Panel - PRS Skating Academy — Official Registration</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #050a1a;
+            color: white;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: gold;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input {
+            padding: 8px;
+            width: 250px;
+        }
+
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+            border: none;
+            background: gold;
+            font-weight: bold;
+        }
+
+        .category {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #0a1535;
+            border-radius: 10px;
+            border: 1px solid gold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid gold;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background: #111c44;
+            color: gold;
+        }
+
+        .delete-btn {
+            background: red;
+            color: white;
+            padding: 5px 8px;
+        }
+
+        .payment-btn {
+            background: gold;
+            color: #050a1a;
+            /* dark text for contrast */
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.2s;
+        }
+
+        .payment-btn:hover {
+            background: #ffdd00;
+            /* slightly brighter on hover */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🏆 Admin Panel - MR. P.G.SEKAR MEMORIAL
+        5th PRS Roller Skating Championship 2026</h1>
+    <div id="totalCounts" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+
+    <div class="top-bar">
+        <input type="text" id="search" placeholder="Search by Name..." oninput="filterStudents()">
+        <button onclick="exportExcel()">Export to Excel</button>
+    </div>
+
+    <div id="searchResults"></div>
+    <div id="data"></div>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCha_pfcRqCVOAPcsqyNolVd72S7asBSh0",
+            authDomain: "grace-skating-240af.firebaseapp.com",
+            projectId: "grace-skating-240af",
+            storageBucket: "grace-skating-240af.firebasestorage.app",
+            messagingSenderId: "850252446428",
+            appId: "1:850252446428:web:2c3b1c8fe9bf9a91f69219",
+            measurementId: "G-5FGE3HLHMW"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allStudents = [];
+
+        async function loadData() {
+            const snapshot = await getDocs(collection(db, "registrations"));
+
+            const grouped = {
+                "Quad": { Male: {}, Female: {} },
+                "In-line": { Male: {}, Female: {} },
+                "Adjustable": { Male: {}, Female: {} },
+                "Toy Inline": { Male: {}, Female: {} }
+            };
+
+            allStudents = [];
+
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                data.id = docSnap.id;
+
+                if (!data.name && data.fullName) data.name = data.fullName;
+                if (!data.primaryPhone && data.primaryContact) data.primaryPhone = data.primaryContact;
+                if (!data.clubName && data.academy) data.clubName = data.academy;
+
+                allStudents.push(data);
+
+                let type = data.skateType || data.discipline || "Unknown";
+
+                let age = parseInt(data.age);
+                if (isNaN(age)) return;
+
+                let gender = (data.gender || "").toLowerCase();
+                if (gender === "male") gender = "Male";
+                else if (gender === "female") gender = "Female";
+                else return;
+
+                let t = (type || "").toLowerCase().replace(/\s+/g, '').replace('-', '');
+                if (t.includes("toyinline") || t.includes("toyline")) type = "Toy Inline";
+                else if (t.includes("inline")) type = "In-line";
+                else if (t.includes("quad")) type = "Quad";
+                else if (t.includes("adjustable")) type = "Adjustable";
+
+                if (!grouped[type]) return;
+
+                const ageKey = `${age} years`;
+
+                if (!grouped[type][gender][ageKey]) grouped[type][gender][ageKey] = [];
+
+                grouped[type][gender][ageKey].push(data);
+            });
+
+            // --------------------- DISPLAY COUNT CARDS ---------------------
+            const disciplineCounts = { "Quad": 0, "In-line": 0, "Adjustable": 0, "Toy Inline": 0 };
+            allStudents.forEach(s => {
+                let type = s.skateType || s.discipline || "Unknown";
+                let t = (type || "").toLowerCase().replace(/\s+/g, '').replace('-', '');
+                if (t.includes("toyinline") || t.includes("toyline")) type = "Toy Inline";
+                else if (t.includes("inline")) type = "In-line";
+                else if (t.includes("quad")) type = "Quad";
+                else if (t.includes("adjustable")) type = "Adjustable";
+
+                if (disciplineCounts[type] !== undefined) disciplineCounts[type]++;
+            });
+
+            const totalDiv = document.getElementById("totalCounts");
+            totalDiv.innerHTML = ""; // clear previous cards
+            const counts = [
+                { label: "Total Registrations", value: allStudents.length },
+                { label: "Quad", value: disciplineCounts["Quad"] },
+                { label: "In-line", value: disciplineCounts["In-line"] },
+                { label: "Adjustable", value: disciplineCounts["Adjustable"] },
+                { label: "Toy Inline", value: disciplineCounts["Toy Inline"] }
+            ];
+
+            counts.forEach(c => {
+                const card = document.createElement("div");
+                card.style.background = "#0a1535";
+                card.style.border = "2px solid gold";
+                card.style.padding = "15px 20px";
+                card.style.borderRadius = "10px";
+                card.style.fontWeight = "bold";
+                card.style.fontSize = "16px";
+                card.style.color = "gold";
+                card.style.minWidth = "160px";
+                card.style.textAlign = "center";
+                card.innerHTML = `${c.label}<br><span style="font-size: 22px;">${c.value}</span>`;
+                totalDiv.appendChild(card);
+            });
+
+            displayGrouped(grouped);
+            document.getElementById("data").style.display = "block";
+            document.getElementById("searchResults").innerHTML = "";
+        }
+
+        function createTable(students) {
+            if (students.length === 0) return "<p>No Data</p>";
+
+            let table = `
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Age</th>
+    <th>Academy</th>
+    <th>Discipline</th>
+    <th>Payment Screenshot</th>
+    <th>Action</th>
+  </tr>
+`;
+
+            students.forEach(s => {
+                // Determine screenshot URL from possible keys
+                const screenshotUrl = s.paymentScreenshot || s.payment || s.screenshot || s.paymentProof;
+
+                table += `
+  <tr>
+    <td>${s.name || "N/A"}</td>
+    <td>${s.age || "N/A"}</td>
+    <td>${s.clubName || "N/A"}</td>
+    <td>${s.rink || s.disciplines?.join(", ") || "N/A"}</td>
+    <td>
+  ${screenshotUrl
+                        ? `<a href="${screenshotUrl}" download class="payment-btn">Download</a>`
+                        : "Not Uploaded"}
+</td>
+    <td>
+      <button class="delete-btn" onclick="deleteStudent('${s.id}')">Delete</button>
+    </td>
+  </tr>`;
+            });
+
+            table += "</table>";
+            return table;
+        }
+
+        function displayGrouped(grouped) {
+            const container = document.getElementById("data");
+            container.innerHTML = "";
+
+            for (const type in grouped) {
+                const div = document.createElement("div");
+                div.className = "category";
+
+                // ✅ ADDED BUTTON ONLY
+                div.innerHTML = `
+                    <h2>🏁 ${type}</h2>
+                    <button onclick="exportTypeExcel('${type}')">Export ${type} Excel</button>
+                `;
+
+                for (const gender in grouped[type]) {
+                    const emoji = gender === "Male" ? "👦" : "👧";
+                    div.innerHTML += `<h3>${emoji} ${gender}</h3>`;
+
+                    const ages = Object.keys(grouped[type][gender])
+                        .sort((a, b) => parseInt(a) - parseInt(b));
+
+                    for (const age of ages) {
+                        div.innerHTML += `<h4>${age}</h4>`;
+                        div.innerHTML += createTable(grouped[type][gender][age]);
+                    }
+                }
+
+                container.appendChild(div);
+            }
+        }
+
+        window.exportTypeExcel = function (selectedType) {
+
+            const wb = XLSX.utils.book_new();
+            let sheetData = [];
+
+            const filtered = allStudents.filter(s => {
+
+                let rawType = (s.skateType || s.discipline || "");
+
+                let t = rawType.toLowerCase()
+                    .replace(/\s+/g, '')
+                    .replace(/-/g, '');
+
+                let normalizedType = "";
+
+                if (t.includes("toyinline") || t.includes("toyline")) {
+                    normalizedType = "Toy Inline";
+                }
+                else if (t.includes("inline")) {
+                    normalizedType = "In-line";
+                }
+                else if (t.includes("quad")) {
+                    normalizedType = "Quad";
+                }
+                else if (t.includes("adjustable")) {
+                    normalizedType = "Adjustable";
+                }
+
+                return normalizedType === selectedType;
+            });
+
+            const grouped = { Male: {}, Female: {} };
+
+            filtered.forEach(s => {
+                let age = parseInt(s.age);
+                if (isNaN(age)) return;
+
+                let gender = (s.gender || "").toLowerCase();
+                if (gender === "male") gender = "Male";
+                else if (gender === "female") gender = "Female";
+                else return;
+
+                const ageKey = `${age} Years`;
+
+                if (!grouped[gender][ageKey]) {
+                    grouped[gender][ageKey] = [];
+                }
+
+                grouped[gender][ageKey].push(s);
+            });
+
+            ["Male", "Female"].forEach(gender => {
+
+                const ages = Object.keys(grouped[gender])
+                    .sort((a, b) => parseInt(a) - parseInt(b));
+
+                ages.forEach(age => {
+
+                    sheetData.push([`${selectedType} ${age} ${gender === "Male" ? "Boys" : "Girls"}`]);
+                    sheetData.push([]);
+
+                    // 🔥 ADD THIS HERE
+                    let ageNum = parseInt(age);
+
+                    let col1 = "Rink1";
+                    let col2 = "Rink2";
+
+                    if ((selectedType === "Quad" || selectedType === "In-line") && ageNum >= 6) {
+                        col1 = "Road I";
+                        col2 = "Rink I";
+                    }
+
+                    sheetData.push(["S. No", "Name", "DOB", "Age", "Club", col1, col2, "POSITION"]);
+
+                    grouped[gender][age].forEach((s, i) => {
+                        sheetData.push([
+                            i + 1,
+                            s.name || "",
+                            s.dob || "",
+                            s.age || "",
+                            s.clubName || "",
+                            "", // your existing rink logic stays same
+                            "",
+                            ""
+                        ]);
+                    });
+
+                    sheetData.push([]);
+                    sheetData.push([]);
+                    sheetData.push([]);
+                });
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+            XLSX.utils.book_append_sheet(wb, ws, selectedType);
+
+            XLSX.writeFile(wb, selectedType + "_Report.xlsx");
+        };
+        window.deleteStudent = async function (id) {
+            if (!confirm("Delete this entry?")) return;
+            await deleteDoc(doc(db, "registrations", id));
+            alert("Deleted Successfully");
+            location.reload();
+        };
+
+        window.filterStudents = function () {
+            const value = document.getElementById("search").value.toLowerCase();
+            const results = document.getElementById("searchResults");
+            const dataDiv = document.getElementById("data");
+
+            if (value === "") {
+                results.innerHTML = "";
+                dataDiv.style.display = "block";
+                return;
+            }
+
+            dataDiv.style.display = "none";
+
+            const matched = allStudents.filter(s => (s.name || "").toLowerCase().includes(value));
+
+            // Use the updated createTable function that checks all screenshot keys
+            results.innerHTML = createTable(matched);
+        };
+
+        window.exportExcel = function () {
+            const exportData = allStudents.map(s => ({
+                "Name": s.name,
+                "Age": s.age,
+                "Academy": s.clubName,
+                "Discipline": s.rink || s.disciplines?.join(", "),
+                "Gender": s.gender
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
+            XLSX.writeFile(workbook, "PRS_Event_Registrations_2026.xlsx");
+        };
+
+        loadData();
+
+    </script>
+
+</body>
+
+</html>

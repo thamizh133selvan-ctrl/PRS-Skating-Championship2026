@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registration Confirmed — PRS Championship 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #080810;
+      --surface: #0d0d1e;
+      --cyan: #00f0ff;
+      --pink: #ff2d78;
+      --gold: #ffd700;
+      --border: #ffffff14;
+    }
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px
+    }
+
+    /* CHECKMARK */
+    .ring {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 3px solid var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 30px #00f0ff44;
+      animation: ringpop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    @keyframes ringpop {
+      from {
+        transform: scale(0);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .success-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 32px;
+      text-align: center
+    }
+
+    /* SUMMARY CARD */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 24px;
+      animation: fadein 0.6s 0.3s both ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .card-title {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #00f0ff1a
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid #ffffff08;
+      gap: 16px
+    }
+
+    .row:last-child {
+      border-bottom: none
+    }
+
+    .rk {
+      font-size: 12px;
+      color: #666;
+      flex-shrink: 0;
+      width: 140px
+    }
+
+    .rv {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 500;
+      text-align: right;
+      word-break: break-word
+    }
+
+    .rv.cyan {
+      color: var(--cyan)
+    }
+
+    .rv.green {
+      color: #00c853
+    }
+
+    .rv.gold {
+      color: var(--gold)
+    }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadein 0.6s 0.5s both ease
+    }
+
+    .dl-btn {
+      padding: 14px 32px;
+      background: linear-gradient(90deg, #00f0ff18, #ff2d7818);
+      border: 1px solid var(--cyan);
+      border-radius: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dl-btn:hover {
+      background: linear-gradient(90deg, #00f0ff28, #ff2d7828);
+      transform: translateY(-2px)
+    }
+
+    .back-btn {
+      padding: 14px 28px;
+      background: transparent;
+      border: 1px solid #ffffff18;
+      border-radius: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      border-color: #ffffff33;
+      color: #999
+    }
+
+    .event-badge {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: var(--pink);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="event-badge">⚡ PRS Roller Skating Championship 2026</div>
+  <div class="ring">✓</div>
+  <div class="success-title">Registration Confirmed!</div>
+  <p class="success-sub">Your spot is secured. Keep this confirmation for your records.</p>
+
+  <div class="card" id="summaryCard">
+    <div class="card-title">Registration Summary</div>
+    <div id="summaryRows"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="dl-btn" onclick="downloadPDF()">⬇ DOWNLOAD REGISTRATION PDF</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← NEW REGISTRATION</button>
+  </div>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem('prs_registration') || '{}');
+
+    const fields = [
+      ['Full Name', data.fullName],
+      ['Email Address', data.email],
+      ['Gender', data.gender],
+      ['Date of Birth', data.dob],
+      ['Actual Age', data.age],
+      ['Club Name', data.clubName],
+      ['School Name', data.schoolName],
+      ['Primary Contact', data.primaryContact],
+      ['Secondary Contact', data.secondaryContact || '—'],
+      ['Skate Type', data.skateType],
+      ['Rink / Road', data.rink || '—'],
+      ['Payment ID', data.txnId, 'cyan'],
+      ['Payment Status', 'Paid ✓', 'green'],
+      ['Amount Paid', '₹300', 'gold'],
+      ['Registered On', data.timestamp],
+    ];
+
+    const rows = document.getElementById('summaryRows');
+    fields.forEach(([k, v, cls]) => {
+      const d = document.createElement('div');
+      d.className = 'row';
+      d.innerHTML = `<span class="rk">${k}</span><span class="rv ${cls || ''}">${v || '—'}</span>`;
+      rows.appendChild(d);
+    });
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const W = 210, margin = 15;
+      let y = 12;
+
+      // Helper for tick marks
+      const drawTick = (x, y) => {
+        doc.setFont('zapfdingbats');
+        doc.setFontSize(11);
+        doc.text('3', x, y + 0.5, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+      };
+
+      // 1. HEADER SECTION
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor(0, 0, 0);
+      doc.text('MR. P.G.SEKAR MEMORIAL', W / 2, y, { align: 'center' });
+      y += 7;
+      doc.setFontSize(13);
+      doc.text('5th PRS ROLLER SKATING CHAMPIONSHIP 2026', W / 2, y, { align: 'center' });
+      y += 7;
+      doc.setFontSize(12);
+      doc.text('(AFFILIATED TO KANCHEEPURAM DISTRICT)', W / 2, y, { align: 'center' });
+      y += 9;
+
+      // 2. TOP CATEGORY TABLE
+      doc.setLineWidth(0.4);
+      const colW = (W - margin * 2) / 5;
+      const tableH = 9;
+
+      const headers = ["RSFI Category", "Adjustable", "Toy Inline", "Quad", "In Line"];
+      doc.setFontSize(8.5);
+      headers.forEach((h, i) => {
+        doc.rect(margin + i * colW, y, colW, tableH);
+        doc.text(h, margin + i * colW + colW / 2, y + 6, { align: 'center' });
+      });
+      y += tableH;
+
+      headers.forEach((h, i) => {
+        doc.rect(margin + i * colW, y, colW, tableH);
+        if (i === 0) {
+          doc.setFontSize(9.5);
+          doc.setFont('helvetica', 'bold');
+          doc.text(data.ageGroup || "", margin + i * colW + colW / 2, y + 6, { align: 'center' });
+          doc.setFont('helvetica', 'normal');
+        } else {
+          let isSelected = false;
+          if (i === 1 && data.skateType === 'Adjustable') isSelected = true;
+          if (i === 2 && data.skateType === 'Toy Inline') isSelected = true;
+          if (i === 3 && data.skateType === 'Quad') isSelected = true;
+          if (i === 4 && data.skateType === 'In-Line') isSelected = true;
+          if (isSelected) drawTick(margin + i * colW + colW / 2, y + 6);
+        }
+      });
+      y += 12;
+
+      // 3. FORM TITLE
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.text('INDIVIDUAL ENTRY FORM', W / 2, y, { align: 'center' });
+      const titleW = doc.getTextWidth('INDIVIDUAL ENTRY FORM');
+      doc.setLineWidth(0.3);
+      doc.line(W / 2 - titleW / 2 - 2, y + 1.2, W / 2 + titleW / 2 + 2, y + 1.2);
+      y += 11;
+
+      // 4. PERSONAL DETAILS (numbered 1-7)
+      const fields = [
+        ['1. Name', data.fullName],
+        ['2. Email', data.email],
+        ['3. Gender', data.gender],
+        ['4. Date of Birth', data.dob],
+        ['5. Club Name', data.clubName],
+        ['6. School Name', data.schoolName],
+        ['7. Contact Number: Primary', data.primaryContact + '    Secondary: ' + (data.secondaryContact || '—')],
+        ['Actual Age', data.age],
+      ];
+
+      doc.setFontSize(10.5);
+      fields.forEach(([label, value]) => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(label + ': ', margin, y);
+        const labelW = doc.getTextWidth(label + ': ');
+
+        doc.setFont('helvetica', 'normal');
+        const valText = String(value || '');
+        if (label.includes('Address')) {
+          const addrLines = doc.splitTextToSize(valText, W - margin * 2 - labelW - 5);
+          doc.text(addrLines, margin + labelW + 2, y);
+          y += (addrLines.length - 1) * 6;
+        } else {
+          doc.text(valText, margin + labelW + 2, y);
+        }
+
+        doc.setDrawColor(180);
+        doc.setLineWidth(0.2);
+        doc.line(margin + labelW + 2, y + 1, W - margin, y + 1);
+        y += 8.5;
+      });
+
+      y += 3;
+
+      // 5. EVENT SELECTION MATRIX (Grid)
+      const gridW = (W - margin * 2);
+      const halfW = gridW / 2;
+      const rowH = 7.5;
+      const optW = halfW * 0.75;
+      const tickW = halfW * 0.25;
+
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.35);
+
+      const renderEventRow = (leftTitle, rightTitle, leftOpts, rightOpts) => {
+        doc.setFont('helvetica', 'bold');
+        doc.rect(margin, y, halfW, rowH); doc.text(leftTitle, margin + halfW / 2, y + 5, { align: 'center' });
+        doc.rect(margin + halfW, y, halfW, rowH); doc.text(rightTitle, margin + halfW + halfW / 2, y + 5, { align: 'center' });
+        y += rowH;
+
+        doc.setFont('helvetica', 'normal');
+        for (let i = 0; i < 2; i++) {
+          // Left opt
+          doc.rect(margin, y, optW, rowH); doc.text(leftOpts[i].l, margin + 2, y + 5);
+          doc.rect(margin + optW, y, tickW, rowH);
+          if (data.skateType === leftOpts[i].t && data.rink && data.rink.includes(leftOpts[i].l)) drawTick(margin + optW + tickW / 2, y + 5);
+
+          // Right opt
+          doc.rect(margin + halfW, y, optW, rowH); doc.text(rightOpts[i].l, margin + halfW + 2, y + 5);
+          doc.rect(margin + halfW + optW, y, tickW, rowH);
+          if (data.skateType === rightOpts[i].t && data.rink && data.rink.includes(rightOpts[i].l)) drawTick(margin + halfW + optW + tickW / 2, y + 5);
+          y += rowH;
+        }
+      };
+
+      renderEventRow('ADJUSTABLE', 'TOY INLINE',
+        [{ l: 'Rink I', t: 'Adjustable' }, { l: 'Rink II', t: 'Adjustable' }],
+        [{ l: 'Rink IV', t: 'Toy Inline' }, { l: 'Rink V', t: 'Toy Inline' }]
+      );
+
+      const ageVal = parseInt(data.age) || 0;
+      const quadLabel2 = ageVal <= 5 ? 'Rink II' : 'Road I';
+      const inlineLabel2 = ageVal <= 5 ? 'Rink V' : 'Road IV';
+
+      renderEventRow('QUAD', 'IN-LINE',
+        [{ l: 'Rink I', t: 'Quad' }, { l: quadLabel2, t: 'Quad' }],
+        [{ l: 'Rink IV', t: 'In-Line' }, { l: inlineLabel2, t: 'In-Line' }]
+      ); y += 8;
+
+      // 6. RULES & DECLARATION
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      const rules = [
+        "8. No spot entry allowed.",
+        "9. Helmet is compulsory for the skater.",
+        "10. Decision by the Officials will be the final.",
+        "11. Officials nor the management will be responsible for any injuries.",
+        "12. Age Group has given in the norms of RSFI."
+      ];
+      rules.forEach(r => { doc.text(r, margin, y); y += 5.5; });
+
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      const declaration = 'I confirm and declare that I have read and understood the Rules & Regulations of the sport of Roller Skating, and agree to abide by the same. I also confirm and declare that any injury / damages / loss of any nature caused during the championship on or off the playing area, the PRS Skating Academy or its members, Organisers or Officials will not be in any way responsible and it will be entirely at the risk of the undersigned.';
+      const decLines = doc.splitTextToSize(declaration, W - margin * 2);
+      doc.text(decLines, margin, y);
+      y += decLines.length * 4.5 + 12;
+
+      // 7. SIGNATURES
+      doc.setLineWidth(0.45);
+      doc.line(margin, y, margin + 50, y);
+      doc.line(W - margin - 50, y, W - margin, y);
+      y += 5;
+      doc.setFontSize(9.5);
+      doc.text('Signature of the Skater', margin, y);
+      doc.text('Signature of Parent / Guardian', W - margin, y, { align: 'right' });
+
+      y += 12;
+
+      // 8. FOOTER BANNER
+      doc.setLineWidth(0.65);
+      doc.rect(margin, y, W - margin * 2, 10);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('REGISTRATION FEES Rs.300/- SHOULD BE PAID ALONG WITH THIS APPLICATION FORM', W / 2, y + 6.5, { align: 'center' });
+
+      doc.save(`PRS_Championship_2026_${data.fullName.replace(/\s+/g, '_')}.pdf`);
+    }
+  </script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCha_pfcRqCVOAPcsqyNolVd72S7asBSh0",
+      authDomain: "grace-skating-240af.firebaseapp.com",
+      projectId: "grace-skating-240af",
+      storageBucket: "grace-skating-240af.firebasestorage.app",
+      messagingSenderId: "850252446428",
+      appId: "1:850252446428:web:2c3b1c8fe9bf9a91f69219",
+      measurementId: "G-5FGE3HLHMW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get("id");
+
+    let firebaseData = {};
+
+    if (docId) {
+      db.collection("registrations").doc(docId).get()
+        .then((doc) => {
+          if (doc.exists) {
+            firebaseData = doc.data();
+            localStorage.setItem('prs_registration', JSON.stringify(firebaseData));
+            renderData(firebaseData);
+          }
+        });
+    } else {
+      firebaseData = JSON.parse(localStorage.getItem('prs_registration') || '{}');
+      renderData(firebaseData);
+    }
+
+    function renderData(data) {
+      const rows = document.getElementById('summaryRows');
+      rows.innerHTML = "";
+
+      const fields = [
+        ['Full Name', data.fullName],
+        ['Email Address', data.email],
+        ['Actual Age', data.age],
+        ['Discipline', data.skateType + " - " + data.rink],
+        ['Club Name', data.clubName],
+        ['Phone Number', data.primaryContact],
+        ['Payment Status', 'Paid ✓'],
+      ];
+
+      fields.forEach(([k, v]) => {
+        const d = document.createElement('div');
+        d.className = 'row';
+        d.innerHTML = `<span class="rk">${k}</span><span class="rv">${v || '—'}</span>`;
+        rows.appendChild(d);
+      });
+    }
+  </script>
+</body>
+</body>
+
+</html>
