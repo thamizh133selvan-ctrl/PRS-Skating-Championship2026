@@ -1095,6 +1095,10 @@
         alert('Please complete the payment first!');
         return;
       }
+      if (!screenshotData) {
+        alert('Please upload the payment screenshot first!');
+        return;
+      }
       const data = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
@@ -1107,7 +1111,8 @@
         age: document.getElementById('age').value,
         skateType: skateType,
         rink: selectedEvents.join(', '),
-        timestamp: new Date().toLocaleString()
+        timestamp: new Date().toLocaleString(),
+        paymentScreenshot: screenshotData
       };
       // basic validation
       const required = ['fullName', 'email', 'gender', 'dob', 'clubName', 'schoolName', 'primaryContact'];
