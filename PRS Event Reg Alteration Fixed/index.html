@@ -872,8 +872,6 @@
   </div>
 
   <script>
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-    import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
     // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyCha_pfcRqCVOAPcsqyNolVd72S7asBSh0",
@@ -885,11 +883,9 @@
       measurementId: "G-5FGE3HLHMW"
     };
 
-
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    export const storage = getStorage(app);
 
     let skateType = '';
     let selectedEvents = [];
@@ -1094,7 +1090,7 @@
       }
     }
 
-    async function submitForm() {
+    function submitForm() {
       if (!paymentDone) {
         alert('Please complete the payment first!');
         return;
@@ -1125,21 +1121,6 @@
       sb.disabled = true;
       sb.textContent = 'SAVING REGISTRATION...';
 
-      // 1️⃣ Upload screenshot to Firebase Storage
-      const fileInput = document.getElementById('screenshot');
-      const file = fileInput?.files[0];
-
-      // create storage reference
-      const fileRef = ref(storage, 'paymentScreenshots/' + Date.now() + '_' + file.name);
-
-      // upload file
-      await uploadBytes(fileRef, file);
-
-      // get download URL
-      const uploadedScreenshotURL = await getDownloadURL(fileRef);
-
-      // add the URL to your Firestore data
-      data.paymentScreenshot = uploadedScreenshotURL;
       db.collection("registrations").add(data)
         .then((docRef) => {
           console.log("Document written with ID: ", docRef.id);

@@ -90,22 +90,6 @@
             /* slightly brighter on hover */
             transform: scale(1.05);
         }
-
-        .download-btn {
-            background-color: gold;
-            color: black;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .download-btn:hover {
-            background-color: #ffd700cc;
-        }
     </style>
 </head>
 
@@ -159,15 +143,9 @@
                 const data = docSnap.data();
                 data.id = docSnap.id;
 
-                if (!data.paymentScreenshot && data.screenshot) {
-                    data.paymentScreenshot = data.screenshot;
-                }
-
                 if (!data.name && data.fullName) data.name = data.fullName;
                 if (!data.primaryPhone && data.primaryContact) data.primaryPhone = data.primaryContact;
                 if (!data.clubName && data.academy) data.clubName = data.academy;
-
-                if (!data.paymentScreenshot) data.paymentScreenshot = "";
 
                 allStudents.push(data);
 
@@ -255,6 +233,9 @@
 `;
 
             students.forEach(s => {
+                // Determine screenshot URL from possible keys
+                const screenshotUrl = s.paymentScreenshot || s.payment || s.screenshot || s.paymentProof;
+
                 table += `
   <tr>
     <td>${s.name || "N/A"}</td>
@@ -262,8 +243,8 @@
     <td>${s.clubName || "N/A"}</td>
     <td>${s.rink || s.disciplines?.join(", ") || "N/A"}</td>
     <td>
-  ${s.paymentScreenshot
-                        ? `<a href="${s.paymentScreenshot}" download class="download-btn">Download</a>`
+  ${screenshotUrl
+                        ? `<a href="${screenshotUrl}" download class="payment-btn">Download</a>`
                         : "Not Uploaded"}
 </td>
     <td>
@@ -275,6 +256,7 @@
             table += "</table>";
             return table;
         }
+
         function displayGrouped(grouped) {
             const container = document.getElementById("data");
             container.innerHTML = "";
