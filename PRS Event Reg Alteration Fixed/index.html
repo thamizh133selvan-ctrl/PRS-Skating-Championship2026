@@ -852,11 +852,23 @@
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div class="modal-brand">Google Pay · UPI · Secure Payment</div>
       <div class="modal-title">PRS Skating Academy</div>
-      <div class="modal-sub">Scan the QR code or click the button below to pay via any UPI app.</div>
+      <div class="modal-sub">Scan the QR code or click the Copy UPI ID button to pay via any UPI app.</div>
       <div id="upiArea" style="text-align:center;margin:20px 0">
         <div id="qrcode" style="background:#fff;padding:8px;display:inline-block;border-radius:12px;margin-bottom:15px">
           <img src="Screenshot 2026-03-23 192837.png" style="width:200px;display:block;border-radius:8px"
             alt="UPI QR Code" />
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ccc;">
+            <p style="font-size: 14px; font-weight: 700; color: #222; margin-bottom: 10px; letter-spacing: 0.5px;">
+              UPI ID: <span id="upiId" style="user-select: all; color: #ff2d78;">ammlu.k-1@okicici</span>
+            </p>
+            <button onclick="copyUPI(this)"
+              style="padding: 8px 16px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-weight: 600; color: #333; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.05);"
+              onmouseover="this.style.background='#e2e6ea'; this.style.borderColor='#ccc'"
+              onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#ddd'">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy UPI ID</span>
+            </button>
+          </div>
         </div>
         <button class="modal-pay-btn" onclick="doPayment()">PAID</button>
       </div>
@@ -1170,6 +1182,26 @@
     (function () {
       emailjs.init("7nhsJkVSbi0Es7es3"); // 🔴 replace with your public key
     })();
+  </script>
+  <script>
+    function copyUPI(btn) {
+      const upi = document.getElementById("upiId").innerText;
+      navigator.clipboard.writeText(upi).then(() => {
+        const span = btn.querySelector('span');
+        const originalText = span.innerText;
+        span.innerText = "Copied!";
+        btn.style.background = "#e8f5e9";
+        btn.style.borderColor = "#4caf50";
+        btn.style.color = "#2e7d32";
+        
+        setTimeout(() => {
+          span.innerText = originalText;
+          btn.style.background = "#f8f9fa";
+          btn.style.borderColor = "#ddd";
+          btn.style.color = "#333";
+        }, 2000);
+      });
+    }
   </script>
 </body>
 
